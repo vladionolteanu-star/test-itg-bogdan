@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etichete Digitale - IT Genetics & Mobexpert</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .company-names {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav a:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main Content */
+        .main {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            margin-top: -20px;
+            position: relative;
+            z-index: 10;
+            padding: 3rem 0;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Features Grid */
+        .features {
+            padding: 4rem 0;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .features-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .feature-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Tech Stack */
+        .tech-stack {
+            padding: 4rem 0;
+            background: #f7fafc;
+            border-radius: 20px;
+            margin: 3rem 0;
+        }
+
+        .tech-stack h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: #2d3748;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tech-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tech-item h4 {
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-item p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Project Timeline */
+        .timeline {
+            padding: 4rem 0;
+        }
+
+        .timeline h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: #2d3748;
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+            transform: translateX(50px);
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .timeline-date {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-desc {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+
+        .footer-section p {
+            color: #a0aec0;
+            line-height: 1.6;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #4a5568;
+            padding-top: 2rem;
+            color: #a0aec0;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .nav {
+                display: none;
+            }
+            
+            .timeline-item {
+                flex-direction: column !important;
+                text-align: center;
+            }
+            
+            .timeline-item:nth-child(even) {
+                flex-direction: column !important;
+            }
+            
+            .timeline-dot {
+                margin: 1rem 0;
+            }
+        }
+
+        /* Hover effects */
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">ED</div>
+                    <div class="company-names">
+                        <span>IT Genetics</span>
+                        <span>× Mobexpert</span>
+                    </div>
+                </div>
+                <nav class="nav">
+                    <a href="#features">Funcționalități</a>
+                    <a href="#tech">Tehnologii</a>
+                    <a href="#timeline">Timeline</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Etichete Digitale Inteligente</h1>
+            <p>Revoluționarea experienței de cumpărături prin tehnologie IoT avansată și interfețe intuitive</p>
+            <a href="#features" class="cta-button">Descoperă Proiectul</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Features Section -->
+            <section id="features" class="features">
+                <h2>Funcționalități Principale</h2>
+                <p class="features-subtitle">
+                    O soluție completă care transformă magazinul tradițional într-un spațiu comercial inteligent și interactiv
+                </p>
+                
+                <div class="features-grid">
+                    <div class="feature-card fade-in hover-scale">
+                        <div class="feature-icon">📱</div>
+                        <h3>Display E-Paper Dinamic</h3>
+                        <p>Etichete electronice cu actualizare în timp real a prețurilor și informațiilor produselor, reducând costurile operaționale și erorile umane.</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in hover-scale">
+                        <div class="feature-icon">🔗</div>
+                        <h3>Conectivitate IoT</h3>
+                        <p>Sincronizare automată cu sistemele de management ale magazinului prin conexiuni wireless securizate și fiabile.</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in hover-scale">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Eficiență Energetică</h3>
+                        <p>Tehnologie cu consum redus de energie, baterii cu durată de viață extinsă și opțiuni de încărcare solară.</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in hover-scale">
+                        <div class="feature-icon">📊</div>
+                        <h3>Analytics Avansate</h3>
+                        <p>Colectare și analiză de date despre comportamentul clienților și performanța produselor pentru optimizarea strategiilor de vânzare.</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in hover-scale">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Securitate Robustă</div>
+                        <p>Criptare end-to-end, autentificare multi-factor și protocoale de securitate conform standardelor industriale.</p>
+                    </div>
+                    
+                    <div class="feature-card fade-in hover-scale">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Personalizare Inteligentă</h3>
+                        <p>Conținut dinamic și oferte personalizate bazate pe preferințele clienților și istoricul achizițiilor.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tech Stack Section -->
+            <section id="tech" class="tech-stack">
+                <div class="container">
+                    <h2>Stack Tehnologic</h2>
+                    <div class="tech-grid">
+                        <div class="tech-item fade-in">
+                            <h4>Frontend</h4>
+                            <p>React, Next.js, TypeScript</p>
+                        </div>
+                        <div class="tech-item fade-in">
+                            <h4>Backend</h4>
+                            <p>Node.js, Express, GraphQL</p>
+                        </div>
+                        <div class="tech-item fade-in">
+                            <h4>Database</h4>
+                            <p>PostgreSQL, Redis, MongoDB</p>
+                        </div>
+                        <div class="tech-item fade-in">
+                            <h4>IoT</h4>
+                            <p>ESP32, LoRaWAN, MQTT</p>
+                        </div>
+                        <div class="tech-item fade-in">
+                            <h4>Cloud</h4>
+                            <p>AWS, Docker, Kubernetes</p>
+                        </div>
+                        <div class="tech-item fade-in">
+                            <h4>Analytics</h4>
+                            <p>Elasticsearch, Kibana, ML</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Timeline Section -->
+            <section id="timeline" class="timeline">
+                <h2>Timeline Proiect</h2>
+                <div class="timeline-container">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">Ianuarie 2024</div>
+                            <div class="timeline-title">Analiză & Planificare</div>
+                            <div class="timeline-desc">Studiu de fezabilitate și definirea cerințelor tehnice</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">Februarie 2024</div>
+                            <div class="timeline-title">Design & Prototipare</div>
+                            <div class="timeline-desc">Dezvoltarea prototipurilor hardware și software</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">Martie-Aprilie 2024</div>
+                            <div class="timeline-title">Dezvoltare</div>
+                            <div class="timeline-desc">Implementarea soluțiilor frontend și backend</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">Mai 2024</div>
+                            <div class="timeline-title">Testare & Optimizare</div>
+                            <div class="timeline-desc">Teste extensive și optimizarea performanțelor</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">Iunie 2024</div>
+                            <div class="timeline-title">Pilot în Magazin</div>
+                            <div class="timeline-desc">Implementarea pilot în magazinul Mobexpert</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">Iulie 2024</div>
+                            <div class="timeline-title">Lansare & Scalare</div>
+                            <div class="timeline-desc">Extinderea soluției în rețeaua de magazine</div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>IT Genetics</h3>
+                    <p>Companie de dezvoltare software specializată în soluții IoT și tehnologii emergente pentru retail și industrie.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Mobexpert</h3>
+                    <p>Lider pe piața românească de mobilier și decorațiuni, cu o rețea de peste 30 de magazine la nivel național.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Proiect</h3>
+                    <p>Parteneriat strategic pentru dezvoltarea unei soluții complete de etichete digitale pentru magazinele de retail.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 IT Genetics × Mobexpert. Toate drepturile rezervate.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Header scroll effect
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > lastScrollY && window.scrollY > 100) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
+            lastScrollY = window.scrollY;
+        });
+
+        // Timeline animation delays
+        document.querySelectorAll('.timeline-item').forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.2}s`;
+        });
+
+        // Parallax effect for hero
+        window.addEventListener('scroll', () => {
+            const hero = document.querySelector('.hero');
+            const scrolled = window.pageYOffset;
+            const parallax = scrolled * 0.5;
+            hero.style.transform = `translateY(${parallax}px)`;
+        });
+    </script>
+</body>
+</html>
