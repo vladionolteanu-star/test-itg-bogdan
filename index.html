@@ -3,673 +3,1171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etichete Digitale - IT Genetics & Mobexpert</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Optimizator Rute Livrări</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #1a202c;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
         }
-
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 1rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
-
-        /* Header */
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
         }
-
-        .header-content {
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .upload-section {
+            margin-bottom: 20px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .file-input-wrapper:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+        .date-selector {
+            margin-top: 20px;
+            display: none;
+        }
+        .date-selector label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .date-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .date-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .filter-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            display: none;
+        }
+        .filter-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .deliveries-checklist {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .delivery-checkbox-item {
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.2s;
+        }
+        .delivery-checkbox-item:hover {
+            background: #e9ecef;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .delivery-checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .delivery-checkbox-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .delivery-checkbox-label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delivery-checkbox-client {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .delivery-checkbox-address {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .delivery-checkbox-products {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+            font-size: 12px;
+        }
+        .product-item {
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            background: white;
+            border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .company-names {
-            display: flex;
-            flex-direction: column;
-            font-size: 0.9rem;
+        .product-code {
             font-weight: 600;
-        }
-
-        .nav {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav a {
-            text-decoration: none;
-            color: #4a5568;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-        }
-
-        .nav a:hover {
             color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
+            margin-right: 8px;
         }
-
-        /* Hero Section */
-        .hero {
-            padding: 120px 0 80px;
-            text-align: center;
+        .product-name {
+            flex: 1;
+            color: #333;
+        }
+        .product-price {
+            font-weight: bold;
+            color: #667eea;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+        .delivery-checkbox-value {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 16px;
+            white-space: nowrap;
+            margin-left: 15px;
+        }
+        .recalculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
             font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
         }
-
-        .cta-button:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .recalculate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-
-        /* Main Content */
-        .main {
-            background: white;
-            border-radius: 20px 20px 0 0;
-            margin-top: -20px;
-            position: relative;
-            z-index: 10;
-            padding: 3rem 0;
-            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+        .cluster-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            border: 3px solid;
         }
-
-        /* Features Grid */
-        .features {
-            padding: 4rem 0;
+        .cluster-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
         }
-
-        .features h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .features-subtitle {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #718096;
-            margin-bottom: 3rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .features-grid {
+        .cluster-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
         }
-
-        .feature-card {
+        .cluster-stat {
             background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: 1px solid #e2e8f0;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
         }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        .cluster-stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 3px;
         }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 16px;
+        .cluster-stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .select-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .select-controls button {
+            padding: 8px 16px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .select-controls button:hover {
+            background: #667eea;
+            color: white;
+        }
+        .results {
+            display: none;
+            padding: 30px;
+        }
+        .results-container {
+            display: flex;
+            gap: 20px;
+        }
+        .van-panel {
+            width: 350px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-height: 800px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .van-panel h3 {
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .add-van-btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .add-van-btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        .van-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            transition: all 0.2s;
+        }
+        .van-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .van-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .van-counter {
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+        }
+        .van-dropzone {
+            min-height: 60px;
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            background: white;
+            transition: all 0.2s;
+        }
+        .van-dropzone.drag-over {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+        .van-delivery {
+            background: white;
+            padding: 8px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .van-delivery:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transform: translateX(2px);
+        }
+        .van-delivery-info {
+            flex: 1;
+        }
+        .van-delivery-remove {
+            background: #ff4757;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+        }
+        .van-delivery-remove:hover {
+            background: #ee5a6f;
+            transform: scale(1.1);
+        }
+        .van-stats {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #666;
+        }
+        .map-container {
+            flex: 1;
+        }
+        .calculate-vans-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 1rem;
-            color: #2d3748;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
         }
-
-        .feature-card p {
-            color: #718096;
-            line-height: 1.6;
+        .calculate-vans-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-
-        /* Tech Stack */
-        .tech-stack {
-            padding: 4rem 0;
-            background: #f7fafc;
-            border-radius: 20px;
-            margin: 3rem 0;
+        .dragging {
+            opacity: 0.5;
         }
-
-        .tech-stack h2 {
+        .results h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .delivery-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .delivery-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .delivery-item:hover {
+            transform: translateX(5px);
+        }
+        .delivery-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
             text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-            color: #2d3748;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
         }
-
-        .tech-grid {
+        .delivery-info {
+            display: inline-block;
+            vertical-align: top;
+            width: calc(100% - 50px);
+        }
+        .delivery-address {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .delivery-product {
+            color: #666;
+            font-size: 14px;
+        }
+        .stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
+            gap: 20px;
         }
-
-        .tech-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .tech-item h4 {
-            color: #4a5568;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .tech-item p {
-            color: #718096;
-            font-size: 0.9rem;
-        }
-
-        /* Project Timeline */
-        .timeline {
-            padding: 4rem 0;
-        }
-
-        .timeline h2 {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-            color: #2d3748;
-        }
-
-        .timeline-container {
-            position: relative;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .timeline-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-            opacity: 0;
-            transform: translateX(-50px);
-            animation: slideIn 0.6s ease forwards;
-        }
-
-        .timeline-item:nth-child(even) {
-            flex-direction: row-reverse;
-            transform: translateX(50px);
-        }
-
-        .timeline-dot {
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 50%;
-            margin: 0 2rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .timeline-content {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            max-width: 300px;
-        }
-
-        .timeline-date {
-            color: #667eea;
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-title {
-            color: #2d3748;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-desc {
-            color: #718096;
-            font-size: 0.9rem;
-        }
-
-        /* Footer */
-        .footer {
-            background: #2d3748;
-            color: white;
-            padding: 3rem 0;
+        .stat-item {
             text-align: center;
         }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
-
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            color: #e2e8f0;
+        .stat-label {
+            opacity: 0.9;
+            font-size: 14px;
         }
-
-        .footer-section p {
-            color: #a0aec0;
-            line-height: 1.6;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid #4a5568;
-            padding-top: 2rem;
-            color: #a0aec0;
-        }
-
-        /* Animations */
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero p {
-                font-size: 1.1rem;
-            }
-            
-            .nav {
-                display: none;
-            }
-            
-            .timeline-item {
-                flex-direction: column !important;
-                text-align: center;
-            }
-            
-            .timeline-item:nth-child(even) {
-                flex-direction: column !important;
-            }
-            
-            .timeline-dot {
-                margin: 1rem 0;
-            }
-        }
-
-        /* Hover effects */
-        .hover-scale {
-            transition: transform 0.3s ease;
-        }
-
-        .hover-scale:hover {
-            transform: scale(1.05);
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #c33;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">ED</div>
-                    <div class="company-names">
-                        <span>IT Genetics</span>
-                        <span>× Mobexpert</span>
-                    </div>
+    <div class="container">
+        <div class="header">
+            <h1>🚚 Optimizator Rute Livrări</h1>
+            <p>Grupează cele mai apropiate 8 livrări din București și Ilfov</p>
+        </div>
+        
+        <div class="controls">
+            <div class="upload-section">
+                <label class="file-input-wrapper">
+                    📁 Încarcă fișier CSV
+                    <input type="file" id="csvFile" accept=".csv">
+                </label>
+                <span id="fileName" style="margin-left: 15px; color: #666;"></span>
+            </div>
+            
+            <div class="date-selector" id="dateSelector">
+                <label for="dateSelect">Selectează data de livrare:</label>
+                <select id="dateSelect">
+                    <option value="">-- Alege o dată --</option>
+                </select>
+            </div>
+
+            <div class="filter-section" id="filterSection">
+                <h3>🔍 Filtrează livrările (bifează ce VREI să incluzi)</h3>
+                <div class="select-controls">
+                    <button onclick="selectAll()">✓ Selectează tot</button>
+                    <button onclick="deselectAll()">✗ Deselectează tot</button>
                 </div>
-                <nav class="nav">
-                    <a href="#features">Funcționalități</a>
-                    <a href="#tech">Tehnologii</a>
-                    <a href="#timeline">Timeline</a>
-                    <a href="#contact">Contact</a>
-                </nav>
+                <div class="deliveries-checklist" id="deliveriesChecklist"></div>
+                <button class="recalculate-btn" onclick="recalculateRoute()">🎯 Calculează Clustere (max 7/cluster)</button>
             </div>
         </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Etichete Digitale Inteligente</h1>
-            <p>Revoluționarea experienței de cumpărături prin tehnologie IoT avansată și interfețe intuitive</p>
-            <a href="#features" class="cta-button">Descoperă Proiectul</a>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <!-- Features Section -->
-            <section id="features" class="features">
-                <h2>Funcționalități Principale</h2>
-                <p class="features-subtitle">
-                    O soluție completă care transformă magazinul tradițional într-un spațiu comercial inteligent și interactiv
-                </p>
-                
-                <div class="features-grid">
-                    <div class="feature-card fade-in hover-scale">
-                        <div class="feature-icon">📱</div>
-                        <h3>Display E-Paper Dinamic</h3>
-                        <p>Etichete electronice cu actualizare în timp real a prețurilor și informațiilor produselor, reducând costurile operaționale și erorile umane.</p>
-                    </div>
-                    
-                    <div class="feature-card fade-in hover-scale">
-                        <div class="feature-icon">🔗</div>
-                        <h3>Conectivitate IoT</h3>
-                        <p>Sincronizare automată cu sistemele de management ale magazinului prin conexiuni wireless securizate și fiabile.</p>
-                    </div>
-                    
-                    <div class="feature-card fade-in hover-scale">
-                        <div class="feature-icon">⚡</div>
-                        <h3>Eficiență Energetică</h3>
-                        <p>Tehnologie cu consum redus de energie, baterii cu durată de viață extinsă și opțiuni de încărcare solară.</p>
-                    </div>
-                    
-                    <div class="feature-card fade-in hover-scale">
-                        <div class="feature-icon">📊</div>
-                        <h3>Analytics Avansate</h3>
-                        <p>Colectare și analiză de date despre comportamentul clienților și performanța produselor pentru optimizarea strategiilor de vânzare.</p>
-                    </div>
-                    
-                    <div class="feature-card fade-in hover-scale">
-                        <div class="feature-icon">🛡️</div>
-                        <h3>Securitate Robustă</div>
-                        <p>Criptare end-to-end, autentificare multi-factor și protocoale de securitate conform standardelor industriale.</p>
-                    </div>
-                    
-                    <div class="feature-card fade-in hover-scale">
-                        <div class="feature-icon">🎯</div>
-                        <h3>Personalizare Inteligentă</h3>
-                        <p>Conținut dinamic și oferte personalizate bazate pe preferințele clienților și istoricul achizițiilor.</p>
-                    </div>
+        
+        <div class="results" id="results">
+            <div class="stats" id="stats"></div>
+            <h2>📍 Harta și Organizare Livrări</h2>
+            <div class="results-container">
+                <div class="van-panel" id="vanPanel">
+                    <h3>
+                        <span>🚚 Dubele Mele</span>
+                        <button class="add-van-btn" onclick="addNewVan()">➕ Adaugă Duba</button>
+                    </h3>
+                    <div id="vansList"></div>
+                    <button class="calculate-vans-btn" onclick="calculateVansStats()">📊 Calculează Statistici Dube</button>
                 </div>
-            </section>
-
-            <!-- Tech Stack Section -->
-            <section id="tech" class="tech-stack">
-                <div class="container">
-                    <h2>Stack Tehnologic</h2>
-                    <div class="tech-grid">
-                        <div class="tech-item fade-in">
-                            <h4>Frontend</h4>
-                            <p>React, Next.js, TypeScript</p>
-                        </div>
-                        <div class="tech-item fade-in">
-                            <h4>Backend</h4>
-                            <p>Node.js, Express, GraphQL</p>
-                        </div>
-                        <div class="tech-item fade-in">
-                            <h4>Database</h4>
-                            <p>PostgreSQL, Redis, MongoDB</p>
-                        </div>
-                        <div class="tech-item fade-in">
-                            <h4>IoT</h4>
-                            <p>ESP32, LoRaWAN, MQTT</p>
-                        </div>
-                        <div class="tech-item fade-in">
-                            <h4>Cloud</h4>
-                            <p>AWS, Docker, Kubernetes</p>
-                        </div>
-                        <div class="tech-item fade-in">
-                            <h4>Analytics</h4>
-                            <p>Elasticsearch, Kibana, ML</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Timeline Section -->
-            <section id="timeline" class="timeline">
-                <h2>Timeline Proiect</h2>
-                <div class="timeline-container">
-                    <div class="timeline-item">
-                        <div class="timeline-content">
-                            <div class="timeline-date">Ianuarie 2024</div>
-                            <div class="timeline-title">Analiză & Planificare</div>
-                            <div class="timeline-desc">Studiu de fezabilitate și definirea cerințelor tehnice</div>
-                        </div>
-                        <div class="timeline-dot"></div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content">
-                            <div class="timeline-date">Februarie 2024</div>
-                            <div class="timeline-title">Design & Prototipare</div>
-                            <div class="timeline-desc">Dezvoltarea prototipurilor hardware și software</div>
-                        </div>
-                        <div class="timeline-dot"></div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content">
-                            <div class="timeline-date">Martie-Aprilie 2024</div>
-                            <div class="timeline-title">Dezvoltare</div>
-                            <div class="timeline-desc">Implementarea soluțiilor frontend și backend</div>
-                        </div>
-                        <div class="timeline-dot"></div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content">
-                            <div class="timeline-date">Mai 2024</div>
-                            <div class="timeline-title">Testare & Optimizare</div>
-                            <div class="timeline-desc">Teste extensive și optimizarea performanțelor</div>
-                        </div>
-                        <div class="timeline-dot"></div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content">
-                            <div class="timeline-date">Iunie 2024</div>
-                            <div class="timeline-title">Pilot în Magazin</div>
-                            <div class="timeline-desc">Implementarea pilot în magazinul Mobexpert</div>
-                        </div>
-                        <div class="timeline-dot"></div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-content">
-                            <div class="timeline-date">Iulie 2024</div>
-                            <div class="timeline-title">Lansare & Scalare</div>
-                            <div class="timeline-desc">Extinderea soluției în rețeaua de magazine</div>
-                        </div>
-                        <div class="timeline-dot"></div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer id="contact" class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>IT Genetics</h3>
-                    <p>Companie de dezvoltare software specializată în soluții IoT și tehnologii emergente pentru retail și industrie.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Mobexpert</h3>
-                    <p>Lider pe piața românească de mobilier și decorațiuni, cu o rețea de peste 30 de magazine la nivel național.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Proiect</h3>
-                    <p>Parteneriat strategic pentru dezvoltarea unei soluții complete de etichete digitale pentru magazinele de retail.</p>
+                <div class="map-container">
+                    <div id="map"></div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 IT Genetics × Mobexpert. Toate drepturile rezervate.</p>
-            </div>
+            <h2>📦 Lista Livrărilor (în ordine)</h2>
+            <div class="delivery-list" id="deliveryList"></div>
         </div>
-    </footer>
+    </div>
 
     <script>
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+        let allDeliveries = [];
+        let currentDateDeliveries = [];
+        let map = null;
+        let markers = [];
+        
+        const clusterColors = [
+            {primary: '#667eea', light: '#f0f3ff', name: 'Albastru'},
+            {primary: '#f093fb', light: '#fff0fc', name: 'Roz'},
+            {primary: '#4facfe', light: '#e8f7ff', name: 'Cyan'},
+            {primary: '#43e97b', light: '#e8fff3', name: 'Verde'},
+            {primary: '#fa709a', light: '#ffe8f0', name: 'Roșu'},
+            {primary: '#feca57', light: '#fff9e6', name: 'Galben'},
+            {primary: '#a29bfe', light: '#f3f2ff', name: 'Violet'},
+            {primary: '#fd79a8', light: '#ffe8f2', name: 'Magenta'}
+        ];
+
+        function selectAll() {
+            document.querySelectorAll('.delivery-checkbox').forEach(cb => cb.checked = true);
+        }
+
+        function deselectAll() {
+            document.querySelectorAll('.delivery-checkbox').forEach(cb => cb.checked = false);
+        }
+
+        function recalculateRoute() {
+            const selectedDeliveries = currentDateDeliveries.filter((_, idx) => {
+                const checkbox = document.getElementById(`delivery-${idx}`);
+                return checkbox && checkbox.checked;
             });
+
+            if (selectedDeliveries.length === 0) {
+                alert('Selectează cel puțin o livrare!');
+                return;
+            }
+
+            const clusters = createClusters(selectedDeliveries, 7);
+            displayClusters(clusters, currentDateDeliveries[0].date);
+        }
+
+        function removeDelivery(address) {
+            // Găsește indexul livrării în lista originală
+            const deliveryIndex = currentDateDeliveries.findIndex(d => d.address === address);
+            
+            if (deliveryIndex !== -1) {
+                // Debifează checkbox-ul
+                const checkbox = document.getElementById(`delivery-${deliveryIndex}`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+                
+                // Recalculează automat
+                map.closePopup();
+                setTimeout(() => {
+                    recalculateRoute();
+                }, 100);
+            }
+        }
+
+        function createClusters(deliveries, maxPerCluster) {
+            if (deliveries.length === 0) return [];
+            
+            const numClusters = Math.ceil(deliveries.length / maxPerCluster);
+            const clusters = [];
+            
+            // Sortează după scor (valoare/distanță de la centrul București)
+            const buchCenter = {lat: 44.4268, lng: 26.1025};
+            const scoredDeliveries = deliveries.map(d => ({
+                ...d,
+                score: d.totalValue / (calculateDistance(buchCenter.lat, buchCenter.lng, d.lat, d.lng) + 1)
+            })).sort((a, b) => b.score - a.score);
+            
+            // Împarte în clustere
+            for (let i = 0; i < numClusters; i++) {
+                const start = i * maxPerCluster;
+                const end = Math.min(start + maxPerCluster, scoredDeliveries.length);
+                const clusterDeliveries = scoredDeliveries.slice(start, end);
+                
+                if (clusterDeliveries.length > 0) {
+                    const route = nearestNeighborRoute(clusterDeliveries);
+                    clusters.push({
+                        id: i + 1,
+                        deliveries: route,
+                        color: clusterColors[i % clusterColors.length]
+                    });
+                }
+            }
+            
+            return clusters;
+        }
+
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = file.name;
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    dynamicTyping: false,
+                    complete: function(results) {
+                        console.log('Coloane detectate:', results.meta.fields);
+                        console.log('Primul rând:', results.data[0]);
+                        
+                        // Afișează toate cheile exact cum sunt
+                        if (results.data[0]) {
+                            console.log('Toate cheile:', Object.keys(results.data[0]));
+                        }
+                        processCSV(results.data, results.meta.fields);
+                    },
+                    error: function(error) {
+                        showError('Eroare la citirea fișierului: ' + error.message);
+                    }
+                });
+            }
         });
 
-        // Fade in animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+        function processCSV(data, fields) {
+            console.log('Procesare date... Prima înregistrare:', data[0]);
+            
+            // Grupează comenzile pe adresă pentru a acumula produsele și valorile
+            const groupedByAddress = {};
+            
+            data.forEach((row, idx) => {
+                // Caută coloana de adresă (poate fi ADRESA sau altceva)
+                let address = '';
+                let clientName = '';
+                let storeName = '';
+                let dateOrdin = '';
+                let codArticol = '';
+                let denumire = '';
+                let pretUnitar = 0;
+                
+                // Încearcă toate variantele posibile de nume coloane
+                for (let key in row) {
+                    const keyLower = key.toLowerCase().trim();
+                    if (keyLower.includes('adresa')) address = row[key] || '';
+                    if (keyLower.includes('nume') && keyLower.includes('client')) clientName = row[key] || '';
+                    if (keyLower.includes('nume') && keyLower.includes('magazin')) storeName = row[key] || '';
+                    if (keyLower.includes('data') && keyLower.includes('ordin')) dateOrdin = row[key] || '';
+                    if (keyLower.includes('cod') && keyLower.includes('articol')) codArticol = row[key] || '';
+                    if (keyLower.includes('denumire')) denumire = row[key] || '';
+                    if (keyLower.includes('pret') && keyLower.includes('unitar')) {
+                        pretUnitar = parseFloat(String(row[key]).replace(',', '.')) || 0;
+                    }
+                }
+                
+                if (idx === 0) {
+                    console.log('Mapare coloane:', {address, clientName, storeName, dateOrdin, codArticol, denumire, pretUnitar});
+                }
+                
+                if (address && (address.includes('BUCURESTI') || address.includes('ILFOV'))) {
+                    if (!groupedByAddress[address]) {
+                        groupedByAddress[address] = {
+                            address: address,
+                            clientName: clientName || 'N/A',
+                            storeName: storeName || 'N/A',
+                            date: dateOrdin,
+                            products: [],
+                            totalValue: 0
+                        };
+                    }
+                    
+                    groupedByAddress[address].products.push({
+                        code: String(codArticol).trim() || 'N/A',
+                        name: String(denumire).trim() || 'N/A',
+                        price: pretUnitar
+                    });
+                    groupedByAddress[address].totalValue += pretUnitar;
                 }
             });
-        }, observerOptions);
 
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
-        });
+            console.log('Livrări grupate:', Object.keys(groupedByAddress).length);
 
-        // Header scroll effect
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('.header');
-            if (window.scrollY > lastScrollY && window.scrollY > 100) {
-                header.style.transform = 'translateY(-100%)';
-            } else {
-                header.style.transform = 'translateY(0)';
+            // Convertește în array și adaugă coordonate
+            allDeliveries = Object.values(groupedByAddress).map(delivery => {
+                const coords = extractCoordinates(delivery.address);
+                return {
+                    ...delivery,
+                    lat: coords.lat,
+                    lng: coords.lng
+                };
+            }).filter(row => row.lat && row.lng);
+
+            console.log('Livrări cu coordonate:', allDeliveries.length);
+
+            if (allDeliveries.length === 0) {
+                showError('Nu s-au găsit adrese valide din București sau Ilfov.');
+                return;
             }
-            lastScrollY = window.scrollY;
+
+            const dates = [...new Set(allDeliveries.map(d => d.date))].filter(d => d).sort();
+            const dateSelect = document.getElementById('dateSelect');
+            dateSelect.innerHTML = '<option value="">-- Alege o dată --</option>';
+            dates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = date;
+                dateSelect.appendChild(option);
+            });
+
+            document.getElementById('dateSelector').style.display = 'block';
+        }
+
+        document.getElementById('dateSelect').addEventListener('change', function(e) {
+            const selectedDate = e.target.value;
+            if (selectedDate) {
+                optimizeRoute(selectedDate);
+            }
         });
 
-        // Timeline animation delays
-        document.querySelectorAll('.timeline-item').forEach((item, index) => {
-            item.style.animationDelay = `${index * 0.2}s`;
-        });
+        function calculateScore(delivery, clusterCenter, clusterAvgValue) {
+            const distance = calculateDistance(
+                clusterCenter.lat, 
+                clusterCenter.lng, 
+                delivery.lat, 
+                delivery.lng
+            );
+            
+            // Score = valoare / (distanță + 1)
+            // Comenzile valoroase la distanță mică = scor mare
+            const baseScore = delivery.totalValue / (distance + 1);
+            
+            // Penalizare pentru comenzi mici (<2000 lei) la distanță mare (>1km)
+            let penalty = 1;
+            if (delivery.totalValue < 2000 && distance > 1) {
+                penalty = 0.3;
+            }
+            
+            // Bonus pentru comenzi valoroase (>3000 lei) chiar dacă sunt la 2-3km
+            let bonus = 1;
+            if (delivery.totalValue > 3000 && distance < 3) {
+                bonus = 1.5;
+            }
+            
+            return baseScore * penalty * bonus;
+        }
 
-        // Parallax effect for hero
-        window.addEventListener('scroll', () => {
-            const hero = document.querySelector('.hero');
-            const scrolled = window.pageYOffset;
-            const parallax = scrolled * 0.5;
-            hero.style.transform = `translateY(${parallax}px)`;
-        });
+        function extractCoordinates(address) {
+            const addressMap = {
+                'SECTORUL 1': {lat: 44.4793, lng: 26.0962},
+                'SECTORUL 2': {lat: 44.4525, lng: 26.1255},
+                'SECTORUL 3': {lat: 44.4267, lng: 26.1748},
+                'SECTORUL 4': {lat: 44.3923, lng: 26.1283},
+                'SECTORUL 5': {lat: 44.3976, lng: 26.0712},
+                'SECTORUL 6': {lat: 44.4371, lng: 26.0242},
+                'VOLUNTARI': {lat: 44.5044, lng: 26.1881},
+                'OTOPENI': {lat: 44.5450, lng: 26.0817},
+                'PIPERA': {lat: 44.4936, lng: 26.1478},
+                'BRAGADIRU': {lat: 44.3647, lng: 26.0322},
+                'CHIAJNA': {lat: 44.5286, lng: 25.9847},
+                'PANTELIMON': {lat: 44.4547, lng: 26.2139},
+                'CORBEANCA': {lat: 44.6047, lng: 26.0783},
+                'DOMNESTI': {lat: 44.3397, lng: 25.9711},
+                'PETRESTI': {lat: 44.3736, lng: 26.2450}
+            };
+
+            for (let [key, coords] of Object.entries(addressMap)) {
+                if (address.includes(key)) {
+                    const randomOffset = () => (Math.random() - 0.5) * 0.02;
+                    return {
+                        lat: coords.lat + randomOffset(),
+                        lng: coords.lng + randomOffset()
+                    };
+                }
+            }
+            return {lat: null, lng: null};
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function optimizeRoute(date) {
+            currentDateDeliveries = allDeliveries.filter(d => d.date === date);
+            
+            if (currentDateDeliveries.length === 0) {
+                showError('Nu există livrări pentru această dată.');
+                return;
+            }
+
+            // Afișează lista cu checkboxuri
+            showDeliveriesChecklist(currentDateDeliveries);
+
+            // Calculează inițial clustere
+            const clusters = createClusters(currentDateDeliveries, 7);
+            displayClusters(clusters, date);
+        }
+
+        function showDeliveriesChecklist(deliveries) {
+            const checklistHtml = deliveries
+                .sort((a, b) => a.totalValue - b.totalValue) // Crescător: de la ieftin la scump
+                .map((delivery, idx) => `
+                <div class="delivery-checkbox-item">
+                    <div class="delivery-checkbox-header">
+                        <input type="checkbox" class="delivery-checkbox" id="delivery-${idx}" checked>
+                        <div class="delivery-checkbox-label">
+                            <div class="delivery-checkbox-client">
+                                👤 ${delivery.clientName}
+                            </div>
+                            <div class="delivery-checkbox-address">
+                                📍 ${delivery.address}
+                            </div>
+                            <div style="font-size: 11px; color: #888;">
+                                🏪 ${delivery.storeName}
+                            </div>
+                        </div>
+                        <span class="delivery-checkbox-value">${delivery.totalValue.toFixed(2)} RON</span>
+                    </div>
+                    <div class="delivery-checkbox-products">
+                        <strong>📦 Articole (${delivery.products.length}):</strong>
+                        ${delivery.products.map((p, pIdx) => `
+                            <div class="product-item">
+                                <span class="product-code">${p.code}</span>
+                                <span class="product-name">${p.name}</span>
+                                <span class="product-price">${p.price.toFixed(2)} RON</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('deliveriesChecklist').innerHTML = checklistHtml;
+            document.getElementById('filterSection').style.display = 'block';
+        }
+
+        function findBestValueCluster(deliveries, count) {
+            if (deliveries.length <= count) {
+                return nearestNeighborRoute(deliveries);
+            }
+
+            let bestCluster = null;
+            let maxScore = -Infinity;
+
+            // Încearcă fiecare livrare ca punct de start
+            for (let start = 0; start < deliveries.length; start++) {
+                let cluster = [deliveries[start]];
+                let remaining = deliveries.filter((_, i) => i !== start);
+
+                while (cluster.length < count && remaining.length > 0) {
+                    // Calculează centrul actual al cluster-ului
+                    const center = {
+                        lat: cluster.reduce((sum, d) => sum + d.lat, 0) / cluster.length,
+                        lng: cluster.reduce((sum, d) => sum + d.lng, 0) / cluster.length
+                    };
+                    
+                    const avgValue = cluster.reduce((sum, d) => sum + d.totalValue, 0) / cluster.length;
+
+                    // Găsește următoarea cea mai bună livrare bazat pe score
+                    let maxDeliveryScore = -Infinity;
+                    let bestDelivery = null;
+                    let bestIdx = -1;
+
+                    for (let i = 0; i < remaining.length; i++) {
+                        const score = calculateScore(remaining[i], center, avgValue);
+                        if (score > maxDeliveryScore) {
+                            maxDeliveryScore = score;
+                            bestDelivery = remaining[i];
+                            bestIdx = i;
+                        }
+                    }
+
+                    cluster.push(bestDelivery);
+                    remaining.splice(bestIdx, 1);
+                }
+
+                // Calculează scorul total al cluster-ului
+                const totalValue = cluster.reduce((sum, d) => sum + d.totalValue, 0);
+                const totalDistance = calculateTotalDistance(cluster);
+                const clusterScore = totalValue / (totalDistance + 1);
+
+                if (clusterScore > maxScore) {
+                    maxScore = clusterScore;
+                    bestCluster = cluster;
+                }
+            }
+
+            return nearestNeighborRoute(bestCluster);
+        }
+
+        function nearestNeighborRoute(deliveries) {
+            if (deliveries.length <= 1) return deliveries;
+
+            let route = [deliveries[0]];
+            let remaining = deliveries.slice(1);
+
+            while (remaining.length > 0) {
+                let minDist = Infinity;
+                let closestIdx = -1;
+
+                for (let i = 0; i < remaining.length; i++) {
+                    const dist = calculateDistance(
+                        route[route.length - 1].lat,
+                        route[route.length - 1].lng,
+                        remaining[i].lat,
+                        remaining[i].lng
+                    );
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestIdx = i;
+                    }
+                }
+
+                route.push(remaining[closestIdx]);
+                remaining.splice(closestIdx, 1);
+            }
+
+            return route;
+        }
+
+        function calculateTotalDistance(route) {
+            let total = 0;
+            for (let i = 0; i < route.length - 1; i++) {
+                total += calculateDistance(
+                    route[i].lat, route[i].lng,
+                    route[i + 1].lat, route[i + 1].lng
+                );
+            }
+            return total;
+        }
+
+        function displayClusters(clusters, date) {
+            document.getElementById('results').style.display = 'block';
+
+            const totalDeliveries = clusters.reduce((sum, c) => sum + c.deliveries.length, 0);
+            const totalValue = clusters.reduce((sum, c) => 
+                sum + c.deliveries.reduce((s, d) => s + d.totalValue, 0), 0);
+            const totalDistance = clusters.reduce((sum, c) => sum + calculateTotalDistance(c.deliveries), 0);
+            const myIncome = totalValue * 0.08;
+            
+            const statsHtml = `
+                <div class="stat-item">
+                    <div class="stat-value">${clusters.length}</div>
+                    <div class="stat-label">Clustere</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${totalDeliveries}</div>
+                    <div class="stat-label">Total Livrări</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${totalDistance.toFixed(1)} km</div>
+                    <div class="stat-label">Distanță Totală</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${totalValue.toFixed(0)} RON</div>
+                    <div class="stat-label">Valoare Totală</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${myIncome.toFixed(0)} RON</div>
+                    <div class="stat-label">Venit Tău (8%)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${date}</div>
+                    <div class="stat-label">Data Livrare</div>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = statsHtml;
+
+            if (map) {
+                map.remove();
+            }
+
+            // Calculează bounds pentru toate clusterele
+            const allBounds = [];
+            clusters.forEach(cluster => {
+                cluster.deliveries.forEach(d => allBounds.push([d.lat, d.lng]));
+            });
+
+            map = L.map('map').setView([allBounds[0][0], allBounds[0][1]], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            markers = [];
+
+            // Desenează fiecare cluster
+            clusters.forEach((cluster, clusterIdx) => {
+                cluster.deliveries.forEach((delivery, index) => {
+                    const number = index + 1;
+                    const icon = L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div style="background: ${cluster.color.primary}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; border: 3px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.3);">
+                            <div style="text-align: center; line-height: 1.2;">
+                                <div style="font-size: 10px;">C${cluster.id}</div>
+                                <div>${number}</div>
+                            </div>
+                        </div>`,
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20]
+                    });
+
+                    const popupContent = `
+                        <div style="min-width: 320px; max-height: 400px; overflow-y: auto;">
+                            <div style="background: ${cluster.color.primary}; color: white; padding: 10px; margin: -10px -10px 10px -10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+                                <span>🚚 Cluster ${cluster.id} - Livrare #${number}</span>
+                                <button onclick="removeDelivery('${delivery.address}')" style="background: rgba(255,255,255,0.2); border: 2px solid white; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
+                            </div>
+                            <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid #eee;">
+                                <div style="margin-bottom: 6px;">
+                                    <strong>👤 Client:</strong><br>
+                                    <span style="color: ${cluster.color.primary}; font-weight: 600;">${delivery.clientName}</span>
+                                </div>
+                                <div style="margin-bottom: 6px;">
+                                    <strong>🏪 Magazin:</strong><br>
+                                    ${delivery.storeName}
+                                </div>
+                                <div>
+                                    <strong>📍 Adresa:</strong><br>
+                                    <span style="font-size: 11px; color: #666;">${delivery.address}</span>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px;">
+                                <strong>📦 Produse (${delivery.products.length}):</strong>
+                            </div>
+                            ${delivery.products.map((p, idx) => `
+                                <div style="font-size: 11px; margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                                    <div style="font-weight: 600; color: #333; margin-bottom: 3px;">
+                                        ${idx + 1}. ${p.name}
+                                    </div>
+                                    <div style="color: #666; margin-bottom: 2px;">
+                                        <strong>Cod:</strong> ${p.code}
+                                    </div>
+                                    <div style="color: ${cluster.color.primary}; font-weight: bold;">
+                                        ${p.price.toFixed(2)} RON
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 2px solid ${cluster.color.primary}; font-weight: bold; text-align: right; font-size: 16px;">
+                                Total: ${delivery.totalValue.toFixed(2)} RON
+                            </div>
+                        </div>
+                    `;
+                    
+                    const marker = L.marker([delivery.lat, delivery.lng], {icon: icon})
+                        .addTo(map)
+                        .bindPopup(popupContent, {maxWidth: 400, maxHeight: 450});
+                    
+                    markers.push(marker);
+
+                    // Desenează linii între livrările din același cluster
+                    if (index < cluster.deliveries.length - 1) {
+                        L.polyline([
+                            [delivery.lat, delivery.lng],
+                            [cluster.deliveries[index + 1].lat, cluster.deliveries[index + 1].lng]
+                        ], {
+                            color: cluster.color.primary,
+                            weight: 3,
+                            opacity: 0.7
+                        }).addTo(map);
+                    }
+                });
+            });
+
+            map.fitBounds(allBounds, {padding: [50, 50]});
+
+            // Afișează lista pe clustere
+            const listHtml = clusters.map((cluster, cIdx) => {
+                const clusterDistance = calculateTotalDistance(cluster.deliveries);
+                const clusterValue = cluster.deliveries.reduce((sum, d) => sum + d.totalValue, 0);
+                const clusterIncome = clusterValue * 0.08;
+
+                return `
+                    <div class="cluster-section" style="border-color: ${cluster.color.primary}; background: ${cluster.color.light};">
+                        <div class="cluster-header" style="background: ${cluster.color.primary};">
+                            🚚 Cluster ${cluster.id} - ${cluster.deliveries.length} Livrări
+                        </div>
+                        <div class="cluster-stats">
+                            <div class="cluster-stat">
+                                <div class="cluster-stat-value">${clusterDistance.toFixed(1)} km</div>
+                                <div class="cluster-stat-label">Distanță</div>
+                            </div>
+                            <div class="cluster-stat">
+                                <div class="cluster-stat-value">${clusterValue.toFixed(0)} RON</div>
+                                <div class="cluster-stat-label">Valoare</div>
+                            </div>
+                            <div class="cluster-stat">
+                                <div class="cluster-stat-value">${clusterIncome.toFixed(0)} RON</div>
+                                <div class="cluster-stat-label">Venit (8%)</div>
+                            </div>
+                        </div>
+                        ${cluster.deliveries.map((delivery, index) => `
+                            <div class="delivery-item" style="border-left-color: ${cluster.color.primary};">
+                                <span class="delivery-number" style="background: ${cluster.color.primary};">${index + 1}</span>
+                                <div class="delivery-info">
+                                    <div class="delivery-address">${delivery.address}</div>
+                                    <div style="margin-top: 8px; padding: 8px; background: white; border-radius: 6px;">
+                                        <div style="margin-bottom: 5px;">
+                                            <strong>👤 Client:</strong> <span style="color: ${cluster.color.primary};">${delivery.clientName}</span>
+                                        </div>
+                                        <div style="margin-bottom: 8px;">
+                                            <strong>🏪 Magazin:</strong> ${delivery.storeName}
+                                        </div>
+                                        <div style="border-top: 1px solid #e0e0e0; padding-top: 8px;">
+                                            <strong>📦 Produse (${delivery.products.length}):</strong>
+                                            ${delivery.products.map((p, idx) => `
+                                                <div style="margin-top: 5px; padding-left: 10px; font-size: 13px;">
+                                                    ${idx + 1}. <strong>${p.code}</strong> - ${p.name}
+                                                    <span style="color: ${cluster.color.primary}; font-weight: bold; float: right;">${p.price.toFixed(2)} RON</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        <div style="margin-top: 8px; padding-top: 8px; border-top: 2px solid ${cluster.color.primary}; text-align: right; font-weight: bold; font-size: 15px;">
+                                            Total: ${delivery.totalValue.toFixed(2)} RON
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('deliveryList').innerHTML = listHtml;
+        }
+
+        function showError(message) {
+            alert(message);
+        }
     </script>
 </body>
 </html>
