@@ -529,10 +529,10 @@
                 <div class="van-panel" id="vanPanel">
                     <h3>
                         <span>🚚 Dubele Mele</span>
-                        <button class="add-van-btn" id="addVanBtn">➕ Adaugă Duba</button>
+                        <button class="add-van-btn" onclick="addNewVan()">➕ Adaugă Duba</button>
                     </h3>
                     <div id="vansList"></div>
-                    <button class="calculate-vans-btn" id="calcVansBtn">📊 Calculează Statistici Dube</button>
+                    <button class="calculate-vans-btn" onclick="calculateVansStats()">📊 Calculează Statistici Dube</button>
                 </div>
                 <div class="map-container">
                     <div id="map"></div>
@@ -752,6 +752,52 @@
                 optimizeRoute(selectedDate);
             }
         });
+        
+        // Global functions for buttons
+        window.addNewVan = function() {
+            const vanId = vans.length + 1;
+            const color = clusterColors[vans.length % clusterColors.length];
+            vans.push({
+                id: vanId,
+                color: color,
+                deliveries: []
+            });
+            renderVans();
+        };
+        
+        window.calculateVansStats = function() {
+            const filledVans = vans.filter(v => v.deliveries.length > 0);
+            
+            if (filledVans.length === 0) {
+                alert('Nu ai livrări în dube!');
+                return;
+            }
+            
+            let statsText = `📊 STATISTICI DUBE\n\n`;
+            let totalValue = 0;
+            let totalDeliveries = 0;
+            
+            filledVans.forEach(van => {
+                const vanValue = van.deliveries.reduce((sum, d) => sum + d.totalValue, 0);
+                const vanIncome = vanValue * 0.08;
+                totalValue += vanValue;
+                totalDeliveries += van.deliveries.length;
+                
+                statsText += `🚚 Duba ${van.id} (${van.color.name}):\n`;
+                statsText += `   Livrări: ${van.deliveries.length}\n`;
+                statsText += `   Valoare: ${vanValue.toFixed(0)} RON\n`;
+                statsText += `   Venit: ${vanIncome.toFixed(0)} RON\n\n`;
+            });
+            
+            statsText += `━━━━━━━━━━━━━━━━━━━━\n`;
+            statsText += `TOTAL:\n`;
+            statsText += `Dube: ${filledVans.length}\n`;
+            statsText += `Livrări: ${totalDeliveries}\n`;
+            statsText += `Valoare: ${totalValue.toFixed(0)} RON\n`;
+            statsText += `Venit total (8%): ${(totalValue * 0.08).toFixed(0)} RON`;
+            
+            alert(statsText);
+        };
 
         function calculateScore(delivery, clusterCenter, clusterAvgValue) {
             const distance = calculateDistance(
@@ -839,12 +885,16 @@
             // Afișează lista cu checkboxuri
             showDeliveriesChecklist(currentDateDeliveries);
 
-            // Calculează inițial clustere automate
+            // Calculează inițial clustere automate (apropiate geografic)
             const clusters = createClusters(currentDateDeliveries, 7);
             displayClusters(clusters, date);
             
             // Render panel dube
             renderVans();
+            
+            // Attach event listeners
+            document.getElementById('addVanBtn').addEventListener('click', addNewVan);
+            document.getElementById('calcVansBtn').addEventListener('click', calculateVansStats);
         }
 
         function showDeliveriesChecklist(deliveries) {
