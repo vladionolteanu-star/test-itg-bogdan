@@ -529,10 +529,10 @@
                 <div class="van-panel" id="vanPanel">
                     <h3>
                         <span>🚚 Dubele Mele</span>
-                        <button class="add-van-btn" onclick="addNewVan()">➕ Adaugă Duba</button>
+                        <button class="add-van-btn" id="addVanBtn">➕ Adaugă Duba</button>
                     </h3>
                     <div id="vansList"></div>
-                    <button class="calculate-vans-btn" onclick="calculateVansStats()">📊 Calculează Statistici Dube</button>
+                    <button class="calculate-vans-btn" id="calcVansBtn">📊 Calculează Statistici Dube</button>
                 </div>
                 <div class="map-container">
                     <div id="map"></div>
@@ -830,12 +830,21 @@
                 return;
             }
 
+            // Inițializează cu 2 dube
+            vans = [
+                {id: 1, color: clusterColors[0], deliveries: []},
+                {id: 2, color: clusterColors[1], deliveries: []}
+            ];
+
             // Afișează lista cu checkboxuri
             showDeliveriesChecklist(currentDateDeliveries);
 
-            // Calculează inițial clustere
+            // Calculează inițial clustere automate
             const clusters = createClusters(currentDateDeliveries, 7);
             displayClusters(clusters, date);
+            
+            // Render panel dube
+            renderVans();
         }
 
         function showDeliveriesChecklist(deliveries) {
