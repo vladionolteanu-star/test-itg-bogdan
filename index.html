@@ -6,6 +6,7 @@
     <title>Optimizator Rute Livrări</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+	<script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -15,39 +16,32 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f4f7f6;
             min-height: 100vh;
             padding: 20px;
         }
         .container {
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
             overflow: hidden;
         }
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
         }
         .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-        .header p {
-            opacity: 0.9;
-            font-size: 16px;
+            font-size: 28px;
+            margin-bottom: 5px;
         }
         .controls {
-            padding: 30px;
+            padding: 20px;
             background: #f8f9fa;
             border-bottom: 2px solid #e9ecef;
-        }
-        .upload-section {
-            margin-bottom: 20px;
         }
         .file-input-wrapper {
             position: relative;
@@ -69,245 +63,75 @@
             position: absolute;
             left: -9999px;
         }
-        .date-selector {
-            margin-top: 20px;
-            display: none;
-        }
-        .date-selector label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        .date-selector select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-        .date-selector select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .filter-section {
-            margin-top: 20px;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            display: none;
-        }
-        .filter-section h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        .deliveries-checklist {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .delivery-checkbox-item {
-            padding: 15px;
-            margin-bottom: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            transition: all 0.2s;
-        }
-        .delivery-checkbox-item:hover {
-            background: #e9ecef;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .delivery-checkbox-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 15px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .delivery-checkbox-header {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        .delivery-checkbox-label {
-            flex: 1;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .delivery-checkbox-client {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        .delivery-checkbox-address {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-        .delivery-checkbox-products {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #dee2e6;
-            font-size: 12px;
-        }
-        .product-item {
-            padding: 6px 8px;
-            margin-bottom: 4px;
-            background: white;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .product-code {
-            font-weight: 600;
-            color: #667eea;
-            margin-right: 8px;
-        }
-        .product-name {
-            flex: 1;
-            color: #333;
-        }
-        .product-price {
-            font-weight: bold;
-            color: #667eea;
-            white-space: nowrap;
-            margin-left: 10px;
-        }
-        .delivery-checkbox-value {
-            font-weight: bold;
-            color: #667eea;
-            font-size: 16px;
-            white-space: nowrap;
-            margin-left: 15px;
-        }
-        .recalculate-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .process-btn {
+            padding: 12px 30px;
+            background: #4CAF50;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 15px;
+            margin-left: 15px;
             transition: all 0.3s;
+            display: none;
         }
-        .recalculate-btn:hover {
+        .process-btn:hover {
+            background: #45a049;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        .cluster-section {
-            margin-bottom: 30px;
+        .stats {
+            background: white;
             padding: 20px;
             border-radius: 12px;
-            border: 3px solid;
+            margin: 20px;
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            border: 1px solid #e9ecef;
         }
-        .cluster-header {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            color: white;
-        }
-        .cluster-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .cluster-stat {
-            background: white;
-            padding: 10px;
-            border-radius: 6px;
+        .stat-item {
             text-align: center;
         }
-        .cluster-stat-value {
-            font-size: 20px;
+        .stat-value {
+            font-size: 28px;
             font-weight: bold;
-            margin-bottom: 3px;
-        }
-        .cluster-stat-label {
-            font-size: 12px;
-            color: #666;
-        }
-        .select-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .select-controls button {
-            padding: 8px 16px;
-            border: 1px solid #667eea;
-            background: white;
             color: #667eea;
-            border-radius: 6px;
-            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #666;
             font-size: 13px;
-            transition: all 0.2s;
-        }
-        .select-controls button:hover {
-            background: #667eea;
-            color: white;
-        }
-        .results {
-            display: none;
-            padding: 30px;
         }
         .results-container {
-            display: flex;
+            display: none;
+            padding: 20px;
             gap: 20px;
         }
+        .map-section {
+            flex: 1;
+        }
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
         .van-panel {
-            width: 350px;
+            width: 400px;
             background: white;
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-height: 800px;
+            max-height: 600px;
             overflow-y: auto;
-            flex-shrink: 0;
-        }
-        .van-panel h3 {
-            margin-bottom: 15px;
-            color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .add-van-btn {
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .add-van-btn:hover {
-            background: #5568d3;
-            transform: translateY(-1px);
         }
         .van-item {
             background: #f8f9fa;
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 12px;
-            border-left: 4px solid;
-            transition: all 0.2s;
-        }
-        .van-item:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
         }
         .van-header {
             display: flex;
@@ -317,13 +141,8 @@
             font-weight: bold;
             font-size: 16px;
         }
-        .van-counter {
-            font-size: 14px;
-            color: #666;
-            font-weight: normal;
-        }
         .van-dropzone {
-            min-height: 60px;
+            min-height: 80px;
             border: 2px dashed #ccc;
             border-radius: 6px;
             padding: 10px;
@@ -335,322 +154,185 @@
             background: #f0f3ff;
         }
         .van-delivery {
-            background: white;
+            background: #ffffff;
             padding: 8px;
             margin-bottom: 6px;
             border-radius: 4px;
             font-size: 12px;
-            cursor: move;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.2s;
-        }
-        .van-delivery:hover {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transform: translateX(2px);
-        }
-        .van-delivery-info {
-            flex: 1;
+            border: 1px solid #eee;
         }
         .van-delivery-remove {
             background: #ff4757;
             color: white;
             border: none;
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            line-height: 1;
         }
         .van-delivery-remove:hover {
-            background: #ee5a6f;
-            transform: scale(1.1);
+            background: #d63031;
         }
         .van-stats {
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid #e0e0e0;
             font-size: 13px;
-            color: #666;
-        }
-        .map-container {
-            flex: 1;
-        }
-        .calculate-vans-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-        .calculate-vans-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        .dragging {
-            opacity: 0.5;
-        }
-        .results h2 {
             color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
         }
-        #map {
-            width: 100%;
-            height: 600px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .delivery-list {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-        }
-        .delivery-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .delivery-item:hover {
-            transform: translateX(5px);
-        }
-        .delivery-number {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
+        .add-van-btn {
+            padding: 8px 16px;
             background: #667eea;
             color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 30px;
-            font-weight: bold;
-            margin-right: 15px;
-        }
-        .delivery-info {
-            display: inline-block;
-            vertical-align: top;
-            width: calc(100% - 50px);
-        }
-        .delivery-address {
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
             font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
         }
-        .delivery-product {
-            color: #666;
-            font-size: 14px;
+        .add-van-btn:hover {
+            background: #5568d3;
         }
-        .stats {
+        .progress-container {
+            margin: 20px;
+            background: #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar {
+            height: 30px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 32px;
             font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .stat-label {
-            opacity: 0.9;
-            font-size: 14px;
         }
         .error {
             background: #fee;
             color: #c33;
             padding: 15px;
             border-radius: 8px;
-            margin-top: 20px;
-            border-left: 4px solid #c33;
+            margin: 20px;
+            display: none;
+        }
+        .export-btn {
+            padding: 6px 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .marker-draggable {
+            cursor: grab !important;
+        }
+        .marker-dragging {
+            cursor: grabbing !important;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚚 Optimizator Rute Livrări</h1>
-            <p>Grupează cele mai apropiate 8 livrări din București și Ilfov</p>
+            <h1>🚚 Optimizator Rute Livrări București</h1>
+            <p>Încarcă fișierul CSV și organizează livrările în dube</p>
         </div>
         
         <div class="controls">
-            <div class="upload-section">
-                <label class="file-input-wrapper">
-                    📁 Încarcă fișier CSV
-                    <input type="file" id="csvFile" accept=".csv">
-                </label>
-                <span id="fileName" style="margin-left: 15px; color: #666;"></span>
-            </div>
-            
-            <div class="date-selector" id="dateSelector">
-                <label for="dateSelect">Selectează data de livrare:</label>
-                <select id="dateSelect">
-                    <option value="">-- Alege o dată --</option>
-                </select>
-            </div>
+            <label class="file-input-wrapper">
+                📁 Încarcă fișier CSV
+                <input type="file" id="csvFile" accept=".csv">
+            </label>
+            <span id="fileName" style="margin-left: 15px; color: #666;"></span>
+            <button id="processBtn" class="process-btn" onclick="processDeliveries()">
+                🗺️ Procesează Livrări
+            </button>
+        </div>
 
-            <div class="filter-section" id="filterSection">
-                <h3>🔍 Filtrează livrările (bifează ce VREI să incluzi)</h3>
-                <div class="select-controls">
-                    <button onclick="selectAll()">✓ Selectează tot</button>
-                    <button onclick="deselectAll()">✗ Deselectează tot</button>
-                </div>
-                <div class="deliveries-checklist" id="deliveriesChecklist"></div>
-                <button class="recalculate-btn" onclick="recalculateRoute()">🎯 Calculează Clustere (max 7/cluster)</button>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Total Livrări</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statBucuresti">0</div>
+                <div class="stat-label">București</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statIgnored">0</div>
+                <div class="stat-label">Ignorate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statDate">-</div>
+                <div class="stat-label">Data Livrare</div>
             </div>
         </div>
-        
-        <div class="results" id="results">
-            <div class="stats" id="stats"></div>
-            <h2>📍 Harta și Organizare Livrări</h2>
-            <div class="results-container">
-                <div class="van-panel" id="vanPanel">
-                    <h3>
-                        <span>🚚 Dubele Mele</span>
-                        <button class="add-van-btn" onclick="addNewVan()">➕ Adaugă Duba</button>
-                    </h3>
-                    <div id="vansList"></div>
-                    <button class="calculate-vans-btn" onclick="calculateVansStats()">📊 Calculează Statistici Dube</button>
-                </div>
-                <div class="map-container">
-                    <div id="map"></div>
-                </div>
+
+        <div class="error" id="errorMsg"></div>
+
+        <div class="results-container" id="resultsContainer" style="display: flex;">
+            <div class="map-section">
+                <div id="map"></div>
             </div>
-            <h2>📦 Lista Livrărilor (în ordine)</h2>
-            <div class="delivery-list" id="deliveryList"></div>
+            <div class="van-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>🚚 Dubele Mele</h3>
+                    <button class="add-van-btn" onclick="addNewVan()">➕ Dubă Nouă</button>
+                </div>
+                <div id="vansList"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        const GOOGLE_API_KEY = 'AIzaSyBle5EKMiUuE9F2VOt7UvsV7_WURdElW8Y';
         let allDeliveries = [];
-        let currentDateDeliveries = [];
         let map = null;
         let markers = [];
-        
-        const clusterColors = [
-            {primary: '#667eea', light: '#f0f3ff', name: 'Albastru'},
-            {primary: '#f093fb', light: '#fff0fc', name: 'Roz'},
-            {primary: '#4facfe', light: '#e8f7ff', name: 'Cyan'},
-            {primary: '#43e97b', light: '#e8fff3', name: 'Verde'},
-            {primary: '#fa709a', light: '#ffe8f0', name: 'Roșu'},
-            {primary: '#feca57', light: '#fff9e6', name: 'Galben'},
-            {primary: '#a29bfe', light: '#f3f2ff', name: 'Violet'},
-            {primary: '#fd79a8', light: '#ffe8f2', name: 'Magenta'}
-        ];
+        let vans = [];
+        let geocoder = null;
+        let csvData = null;
 
-        function selectAll() {
-            document.querySelectorAll('.delivery-checkbox').forEach(cb => cb.checked = true);
+        // Încarcă Google Maps Geocoding
+        function loadGoogleMaps() {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=geocoding`;
+            script.onload = () => {
+                geocoder = new google.maps.Geocoder();
+            };
+            document.head.appendChild(script);
         }
 
-        function deselectAll() {
-            document.querySelectorAll('.delivery-checkbox').forEach(cb => cb.checked = false);
-        }
-
-        function recalculateRoute() {
-            const selectedDeliveries = currentDateDeliveries.filter((_, idx) => {
-                const checkbox = document.getElementById(`delivery-${idx}`);
-                return checkbox && checkbox.checked;
-            });
-
-            if (selectedDeliveries.length === 0) {
-                alert('Selectează cel puțin o livrare!');
-                return;
-            }
-
-            const clusters = createClusters(selectedDeliveries, 7);
-            displayClusters(clusters, currentDateDeliveries[0].date);
-        }
-
-        function removeDelivery(address) {
-            // Găsește indexul livrării în lista originală
-            const deliveryIndex = currentDateDeliveries.findIndex(d => d.address === address);
-            
-            if (deliveryIndex !== -1) {
-                // Debifează checkbox-ul
-                const checkbox = document.getElementById(`delivery-${deliveryIndex}`);
-                if (checkbox) {
-                    checkbox.checked = false;
-                }
-                
-                // Recalculează automat
-                map.closePopup();
-                setTimeout(() => {
-                    recalculateRoute();
-                }, 100);
-            }
-        }
-
-        function createClusters(deliveries, maxPerCluster) {
-            if (deliveries.length === 0) return [];
-            
-            const numClusters = Math.ceil(deliveries.length / maxPerCluster);
-            const clusters = [];
-            
-            // Sortează după scor (valoare/distanță de la centrul București)
-            const buchCenter = {lat: 44.4268, lng: 26.1025};
-            const scoredDeliveries = deliveries.map(d => ({
-                ...d,
-                score: d.totalValue / (calculateDistance(buchCenter.lat, buchCenter.lng, d.lat, d.lng) + 1)
-            })).sort((a, b) => b.score - a.score);
-            
-            // Împarte în clustere
-            for (let i = 0; i < numClusters; i++) {
-                const start = i * maxPerCluster;
-                const end = Math.min(start + maxPerCluster, scoredDeliveries.length);
-                const clusterDeliveries = scoredDeliveries.slice(start, end);
-                
-                if (clusterDeliveries.length > 0) {
-                    const route = nearestNeighborRoute(clusterDeliveries);
-                    clusters.push({
-                        id: i + 1,
-                        deliveries: route,
-                        color: clusterColors[i % clusterColors.length]
-                    });
-                }
-            }
-            
-            return clusters;
-        }
+        loadGoogleMaps();
 
         document.getElementById('csvFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 document.getElementById('fileName').textContent = file.name;
+                document.getElementById('processBtn').style.display = 'inline-block';
+                
                 Papa.parse(file, {
                     header: true,
                     skipEmptyLines: true,
-                    dynamicTyping: false,
                     complete: function(results) {
-                        console.log('Coloane detectate:', results.meta.fields);
-                        console.log('Primul rând:', results.data[0]);
-                        
-                        // Afișează toate cheile exact cum sunt
-                        if (results.data[0]) {
-                            console.log('Toate cheile:', Object.keys(results.data[0]));
-                        }
-                        processCSV(results.data, results.meta.fields);
+                        csvData = results.data;
+                        console.log('CSV încărcat:', csvData.length, 'rânduri');
                     },
                     error: function(error) {
                         showError('Eroare la citirea fișierului: ' + error.message);
@@ -659,574 +341,453 @@
             }
         });
 
-        function processCSV(data, fields) {
-            console.log('Procesare date... Prima înregistrare:', data[0]);
-            
-            // Grupează comenzile pe adresă pentru a acumula produsele și valorile
-            const groupedByAddress = {};
-            
-            data.forEach((row, idx) => {
-                // Caută coloana de adresă (poate fi ADRESA sau altceva)
-                let address = '';
-                let clientName = '';
-                let storeName = '';
-                let dateOrdin = '';
-                let codArticol = '';
-                let denumire = '';
-                let pretUnitar = 0;
-                
-                // Încearcă toate variantele posibile de nume coloane
-                for (let key in row) {
-                    const keyLower = key.toLowerCase().trim();
-                    if (keyLower.includes('adresa')) address = row[key] || '';
-                    if (keyLower.includes('nume') && keyLower.includes('client')) clientName = row[key] || '';
-                    if (keyLower.includes('nume') && keyLower.includes('magazin')) storeName = row[key] || '';
-                    if (keyLower.includes('data') && keyLower.includes('ordin')) dateOrdin = row[key] || '';
-                    if (keyLower.includes('cod') && keyLower.includes('articol')) codArticol = row[key] || '';
-                    if (keyLower.includes('denumire')) denumire = row[key] || '';
-                    if (keyLower.includes('pret') && keyLower.includes('unitar')) {
-                        pretUnitar = parseFloat(String(row[key]).replace(',', '.')) || 0;
-                    }
-                }
-                
-                if (idx === 0) {
-                    console.log('Mapare coloane:', {address, clientName, storeName, dateOrdin, codArticol, denumire, pretUnitar});
-                }
-                
-                if (address && (address.includes('BUCURESTI') || address.includes('ILFOV'))) {
-                    if (!groupedByAddress[address]) {
-                        groupedByAddress[address] = {
-                            address: address,
-                            clientName: clientName || 'N/A',
-                            storeName: storeName || 'N/A',
-                            date: dateOrdin,
-                            products: [],
-                            totalValue: 0
-                        };
-                    }
-                    
-                    groupedByAddress[address].products.push({
-                        code: String(codArticol).trim() || 'N/A',
-                        name: String(denumire).trim() || 'N/A',
-                        price: pretUnitar
-                    });
-                    groupedByAddress[address].totalValue += pretUnitar;
-                }
-            });
-
-            console.log('Livrări grupate:', Object.keys(groupedByAddress).length);
-
-            // Convertește în array și adaugă coordonate
-            allDeliveries = Object.values(groupedByAddress).map(delivery => {
-                const coords = extractCoordinates(delivery.address);
-                return {
-                    ...delivery,
-                    lat: coords.lat,
-                    lng: coords.lng
-                };
-            }).filter(row => row.lat && row.lng);
-
-            console.log('Livrări cu coordonate:', allDeliveries.length);
-
-            if (allDeliveries.length === 0) {
-                showError('Nu s-au găsit adrese valide din București sau Ilfov.');
+   async function processDeliveries() {
+            if (!csvData || !geocoder) {
+                showError('CSV nu este încărcat sau Google Maps nu este disponibil');
                 return;
             }
 
-            const dates = [...new Set(allDeliveries.map(d => d.date))].filter(d => d).sort();
-            const dateSelect = document.getElementById('dateSelect');
-            dateSelect.innerHTML = '<option value="">-- Alege o dată --</option>';
-            dates.forEach(date => {
-                const option = document.createElement('option');
-                option.value = date;
-                option.textContent = date;
-                dateSelect.appendChild(option);
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('stats').style.display = 'grid';
+            
+            const deliveries = [];
+            let totalRows = csvData.length;
+            let bucurestiFiltrate = 0;
+            let ignorate = 0;
+
+            // Procesează fiecare rând și adaugă un ID UNIC
+            csvData.forEach((row, index) => {
+                const address = row['Adresa livrare'] || '';
+                
+                if (!isBucurestiAddress(address)) {
+                    ignorate++;
+                    return; // Folosim return pentru a sări peste rândul curent în forEach
+                }
+
+                bucurestiFiltrate++;
+
+                const delivery = {
+                    uniqueId: `delivery_${index}`, // AICI SE CREEAZĂ ID-UL UNIC
+                    idComanda: row['Id comanda'] || '',
+                    magazin: row['Magazin'] || '',
+                    numar: row['Numar'] || '',
+                    dataFinalizare: row['Data finalizare'] || '',
+                    beneficiar: row['Beneficiar'] || '',
+                    adresa: cleanAddress(address),
+                    adresaOriginala: address,
+                    masaTotala: parseFloat(row['Masa totala'] || 0),
+                    metodaLivrare: row['Metoda livrare'] || '',
+                    lat: null,
+                    lng: null
+                };
+
+                deliveries.push(delivery);
             });
 
-            document.getElementById('dateSelector').style.display = 'block';
+            document.getElementById('statTotal').textContent = totalRows;
+            document.getElementById('statBucuresti').textContent = bucurestiFiltrate;
+            document.getElementById('statIgnored').textContent = ignorate;
+            
+            const firstDate = deliveries.find(d => d.dataFinalizare)?.dataFinalizare || '-';
+            document.getElementById('statDate').textContent = firstDate.split(' ')[0];
+
+            await geocodeDeliveries(deliveries);
+            
+            initMap();
+            addNewVan();
+            
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'flex';
         }
 
-        document.getElementById('dateSelect').addEventListener('change', function(e) {
-            const selectedDate = e.target.value;
-            if (selectedDate) {
-                optimizeRoute(selectedDate);
+        function isBucurestiAddress(address) {
+            const upperAddress = address.toUpperCase();
+            const bucurestKeywords = [
+                'BUCURESTI', 'BUCUREȘTI', 'SECTOR', 
+                'VOLUNTARI', 'OTOPENI', 'PIPERA', 
+                'PANTELIMON', 'POPESTI', 'BRAGADIRU',
+                'CHIAJNA', 'MOGOSOAIA', 'BUFTEA', 'ILFOV'
+            ];
+            
+            return bucurestKeywords.some(keyword => upperAddress.includes(keyword));
+        }
+
+        function cleanAddress(address) {
+            let cleaned = address.toUpperCase();
+            
+            // Elimină detalii specifice care pot încurca geocoderul
+            cleaned = cleaned.replace(/,?\s+(APARTAMENT|AP|ET|ETAJ|SC|SCARA|BL|BLOC|INTERFON)\s*\.?\s*\w+/g, '');
+            
+            // Elimină prefixele generice de adresă
+            cleaned = cleaned.replace(/(ADRESA|ADRESA LIVRARE|JUDET|SECTORUL|ORAS|COMUNA)\s*:\s*/g, '');
+
+            // Elimină cuvintele redundante sau spațiile multiple
+            cleaned = cleaned.replace(/\s+/g, ' ').trim();
+            
+            // Asigură că 'BUCURESTI' este prezent dacă există un sector
+            if (cleaned.includes('SECTOR') && !cleaned.includes('BUCURESTI')) {
+                cleaned += ', BUCURESTI';
+            }
+            
+            // Adaugă România pentru precizie maximă
+            if (!cleaned.includes('ROMANIA')) {
+                cleaned += ', ROMANIA';
+            }
+            
+            return cleaned;
+        }
+
+        async function geocodeDeliveries(deliveries) {
+            const BATCH_SIZE = 5;
+            let processed = 0;
+
+            for (let i = 0; i < deliveries.length; i += BATCH_SIZE) {
+                const batch = deliveries.slice(i, Math.min(i + BATCH_SIZE, deliveries.length));
+                
+                await Promise.all(batch.map(async (delivery) => {
+                    const coords = await geocodeAddress(delivery.adresa);
+                    if (coords) {
+                        delivery.lat = coords.lat;
+                        delivery.lng = coords.lng;
+                        allDeliveries.push(delivery);
+                    }
+                }));
+
+                processed += batch.length;
+                updateProgress(processed, deliveries.length);
+
+                // Pauză între batch-uri
+                if (i + BATCH_SIZE < deliveries.length) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+        }
+
+        async function geocodeAddress(address) {
+    if (!geocoder) return null;
+
+    // Pasul 1: Pre-procesare detaliată (din versiunea ta)
+    // Curăță adresa înainte de a o trimite la Google
+    let processed = address.trim().toLowerCase();
+    processed = processed.replace(/^str /, 'Strada ');
+    processed = processed.replace(/^sos /, 'Soseaua ');
+    processed = processed.replace(/nr\s?-\s?/, 'numar ');
+    processed = processed.replace(/,?\s*bl\s[^,]+,?/g, '');
+    processed = processed.replace(/,?\s*sc\s[^,]+,?/g, '');
+    processed = processed.replace(/,?\s*et\s[^,]+,?/g, '');
+    processed = processed.replace(/,?\s*ap\s[^,]+,?/g, '');
+    processed = processed.replace(/,?\s*interfon\s[^,]+,?/g, '');
+    processed = processed.replace(/judetul|jud\s?/i, ', ');
+    processed = processed.replace(/ilfo$/, 'ILFOV');
+    if (!processed.endsWith('romania')) processed += ', Romania';
+
+    return new Promise((resolve) => {
+        geocoder.geocode({ address: processed, region: 'RO' }, (results, status) => {
+            if (status === 'OK' && results[0]) {
+                const result = results[0];
+                const location = result.geometry.location;
+                const locationType = result.geometry.location_type;
+
+                // Pasul 2: Validare strictă a preciziei (din versiunea mea)
+                // Acceptă doar rezultate de înaltă precizie (clădire sau adresă exactă)
+                if (locationType === 'ROOFTOP' || locationType === 'RANGE_INTERPOLATED') {
+                    resolve({
+                        lat: location.lat(),
+                        lng: location.lng()
+                    });
+                } else {
+                    // Ignoră adresele care returnează doar centrul unei străzi sau al unui oraș
+                    console.warn('Adresă imprecisă, ignorată:', address, 'Tip:', locationType);
+                    resolve(null);
+                }
+            } else {
+                // Ignoră adresele care nu pot fi găsite
+                console.warn('Geocodare eșuată pentru:', address);
+                resolve(null);
             }
         });
-        
-        // Global functions for buttons
-        window.addNewVan = function() {
+    });
+}
+
+        function updateProgress(current, total) {
+            const percent = Math.round((current / total) * 100);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = percent + '%';
+        }
+
+        function initMap() {
+            if (map) map.remove();
+            
+            map = L.map('map').setView([44.4268, 26.1025], 11);
+            
+            // ACESTA ESTE CODUL NOU
+L.gridLayer.googleMutant({
+    type: 'roadmap' // Opțiuni: 'roadmap', 'satellite', 'hybrid', 'terrain'
+}).addTo(map);
+
+            // Adaugă markerii
+            allDeliveries.forEach((delivery, index) => {
+                const icon = L.divIcon({
+                    className: 'custom-marker marker-draggable',
+                    html: createMarkerHtml(delivery, index),
+                    iconSize: [45, 60],
+                    iconAnchor: [22, 50]
+                });
+
+                const marker = L.marker([delivery.lat, delivery.lng], { icon: icon });
+				// COD NOU DE ADĂUGAT
+marker.on('add', function() {
+    const markerEl = this.getElement();
+    if (markerEl) {
+        // La apăsarea pinului, dezactivăm mișcarea hărții
+        markerEl.addEventListener('mousedown', () => {
+            map.dragging.disable();
+        });
+    }
+});
+                
+                const popupContent = `
+                    <div style="min-width: 250px;">
+                        <strong>${delivery.beneficiar}</strong><br>
+                        📍 ${delivery.adresaOriginala}<br>
+                        🏪 ${delivery.magazin}<br>
+                        📦 Masa: ${delivery.masaTotala} kg<br>
+                        🚚 ${delivery.metodaLivrare}<br>
+                        <button onclick="addToFirstAvailableVan(${index})" 
+                            style="margin-top: 10px; padding: 5px 10px; background: #4CAF50; 
+                                   color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
+                            Adaugă în Dubă
+                        </button>
+                    </div>
+                `;
+                
+                marker.bindPopup(popupContent);
+                marker.addTo(map);
+                markers.push(marker);
+            });
+
+            // Ajustează view-ul pentru toți markerii
+            if (allDeliveries.length > 0) {
+                const bounds = allDeliveries.map(d => [d.lat, d.lng]);
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+
+            setupDragAndDrop();
+        }
+
+        function createMarkerHtml(delivery, index) {
+            const acronym = delivery.magazin.substring(0, 3).toUpperCase();
+            return `
+                <div id="marker-${index}" 
+                     data-delivery-index="${index}"
+                     draggable="true"
+                     style="background: #667eea; color: white; width: 40px; height: 40px; 
+                            border-radius: 50%; display: flex; align-items: center; 
+                            justify-content: center; border: 3px solid white; 
+                            box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: grab;">
+                    <span style="font-size: 12px; font-weight: bold;">${acronym}</span>
+                </div>
+            `;
+        }
+
+        function setupDragAndDrop() {
+            document.querySelectorAll('[id^="marker-"]').forEach(marker => {
+                marker.addEventListener('dragstart', handleDragStart);
+                marker.addEventListener('dragend', handleDragEnd);
+            });
+        }
+
+        let draggedDelivery = null;
+
+        function handleDragStart(e) {
+            const index = parseInt(e.target.dataset.deliveryIndex);
+            draggedDelivery = allDeliveries[index];
+            e.target.classList.add('marker-dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+        }
+
+       function handleDragEnd(e) {
+            e.target.classList.remove('marker-dragging');
+            draggedDelivery = null;
+        }
+
+        function addNewVan() {
             const vanId = vans.length + 1;
-            const color = clusterColors[vans.length % clusterColors.length];
             vans.push({
                 id: vanId,
-                color: color,
                 deliveries: []
             });
             renderVans();
-        };
-        
-        window.calculateVansStats = function() {
-            const filledVans = vans.filter(v => v.deliveries.length > 0);
-            
-            if (filledVans.length === 0) {
-                alert('Nu ai livrări în dube!');
-                return;
-            }
-            
-            let statsText = `📊 STATISTICI DUBE\n\n`;
-            let totalValue = 0;
-            let totalDeliveries = 0;
-            
-            filledVans.forEach(van => {
-                const vanValue = van.deliveries.reduce((sum, d) => sum + d.totalValue, 0);
-                const vanIncome = vanValue * 0.08;
-                totalValue += vanValue;
-                totalDeliveries += van.deliveries.length;
-                
-                statsText += `🚚 Duba ${van.id} (${van.color.name}):\n`;
-                statsText += `   Livrări: ${van.deliveries.length}\n`;
-                statsText += `   Valoare: ${vanValue.toFixed(0)} RON\n`;
-                statsText += `   Venit: ${vanIncome.toFixed(0)} RON\n\n`;
-            });
-            
-            statsText += `━━━━━━━━━━━━━━━━━━━━\n`;
-            statsText += `TOTAL:\n`;
-            statsText += `Dube: ${filledVans.length}\n`;
-            statsText += `Livrări: ${totalDeliveries}\n`;
-            statsText += `Valoare: ${totalValue.toFixed(0)} RON\n`;
-            statsText += `Venit total (8%): ${(totalValue * 0.08).toFixed(0)} RON`;
-            
-            alert(statsText);
-        };
-
-        function calculateScore(delivery, clusterCenter, clusterAvgValue) {
-            const distance = calculateDistance(
-                clusterCenter.lat, 
-                clusterCenter.lng, 
-                delivery.lat, 
-                delivery.lng
-            );
-            
-            // Score = valoare / (distanță + 1)
-            // Comenzile valoroase la distanță mică = scor mare
-            const baseScore = delivery.totalValue / (distance + 1);
-            
-            // Penalizare pentru comenzi mici (<2000 lei) la distanță mare (>1km)
-            let penalty = 1;
-            if (delivery.totalValue < 2000 && distance > 1) {
-                penalty = 0.3;
-            }
-            
-            // Bonus pentru comenzi valoroase (>3000 lei) chiar dacă sunt la 2-3km
-            let bonus = 1;
-            if (delivery.totalValue > 3000 && distance < 3) {
-                bonus = 1.5;
-            }
-            
-            return baseScore * penalty * bonus;
         }
 
-        function extractCoordinates(address) {
-            const addressMap = {
-                'SECTORUL 1': {lat: 44.4793, lng: 26.0962},
-                'SECTORUL 2': {lat: 44.4525, lng: 26.1255},
-                'SECTORUL 3': {lat: 44.4267, lng: 26.1748},
-                'SECTORUL 4': {lat: 44.3923, lng: 26.1283},
-                'SECTORUL 5': {lat: 44.3976, lng: 26.0712},
-                'SECTORUL 6': {lat: 44.4371, lng: 26.0242},
-                'VOLUNTARI': {lat: 44.5044, lng: 26.1881},
-                'OTOPENI': {lat: 44.5450, lng: 26.0817},
-                'PIPERA': {lat: 44.4936, lng: 26.1478},
-                'BRAGADIRU': {lat: 44.3647, lng: 26.0322},
-                'CHIAJNA': {lat: 44.5286, lng: 25.9847},
-                'PANTELIMON': {lat: 44.4547, lng: 26.2139},
-                'CORBEANCA': {lat: 44.6047, lng: 26.0783},
-                'DOMNESTI': {lat: 44.3397, lng: 25.9711},
-                'PETRESTI': {lat: 44.3736, lng: 26.2450}
-            };
-
-            for (let [key, coords] of Object.entries(addressMap)) {
-                if (address.includes(key)) {
-                    const randomOffset = () => (Math.random() - 0.5) * 0.02;
-                    return {
-                        lat: coords.lat + randomOffset(),
-                        lng: coords.lng + randomOffset()
-                    };
-                }
-            }
-            return {lat: null, lng: null};
-        }
-
-        function calculateDistance(lat1, lng1, lat2, lng2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLng = (lng2 - lng1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                    Math.sin(dLng/2) * Math.sin(dLng/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        function optimizeRoute(date) {
-            currentDateDeliveries = allDeliveries.filter(d => d.date === date);
-            
-            if (currentDateDeliveries.length === 0) {
-                showError('Nu există livrări pentru această dată.');
-                return;
-            }
-
-            // Inițializează cu 2 dube
-            vans = [
-                {id: 1, color: clusterColors[0], deliveries: []},
-                {id: 2, color: clusterColors[1], deliveries: []}
-            ];
-
-            // Afișează lista cu checkboxuri
-            showDeliveriesChecklist(currentDateDeliveries);
-
-            // Calculează inițial clustere automate (apropiate geografic)
-            const clusters = createClusters(currentDateDeliveries, 7);
-            displayClusters(clusters, date);
-            
-            // Render panel dube
-            renderVans();
-            
-            // Attach event listeners
-            document.getElementById('addVanBtn').addEventListener('click', addNewVan);
-            document.getElementById('calcVansBtn').addEventListener('click', calculateVansStats);
-        }
-
-        function showDeliveriesChecklist(deliveries) {
-            const checklistHtml = deliveries
-                .sort((a, b) => a.totalValue - b.totalValue) // Crescător: de la ieftin la scump
-                .map((delivery, idx) => `
-                <div class="delivery-checkbox-item">
-                    <div class="delivery-checkbox-header">
-                        <input type="checkbox" class="delivery-checkbox" id="delivery-${idx}" checked>
-                        <div class="delivery-checkbox-label">
-                            <div class="delivery-checkbox-client">
-                                👤 ${delivery.clientName}
-                            </div>
-                            <div class="delivery-checkbox-address">
-                                📍 ${delivery.address}
-                            </div>
-                            <div style="font-size: 11px; color: #888;">
-                                🏪 ${delivery.storeName}
-                            </div>
+        function renderVans() {
+            const html = vans.map(van => `
+                <div class="van-item">
+                    <div class="van-header">
+                        <span>🚚 Duba ${van.id}</span>
+                        <span>${van.deliveries.length} livrări</span>
+                    </div>
+                    <div class="van-dropzone" 
+                         id="van-${van.id}"
+                         ondrop="dropInVan(event, ${van.id})"
+                         ondragover="allowDrop(event)"
+                         ondragleave="leaveDrop(event)">
+                        ${van.deliveries.length === 0 ? 
+                            '<p style="text-align: center; color: #999;">Trage livrări aici</p>' : 
+                            van.deliveries.map((d, idx) => `
+                                <div class="van-delivery">
+                                    <div>
+                                        <strong>${d.beneficiar}</strong><br>
+                                        <small>${d.adresa.substring(0, 40)}...</small>
+                                    </div>
+                                    <button class="van-delivery-remove" onclick="removeFromVan(${van.id}, ${idx})">×</button>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                    ${van.deliveries.length > 0 ? `
+                        <div class="van-stats">
+                            <strong>Total: ${van.deliveries.length} livrări</strong><br>
+                            Masă totală: ${van.deliveries.reduce((sum, d) => sum + d.masaTotala, 0).toFixed(1)} kg
                         </div>
-                        <span class="delivery-checkbox-value">${delivery.totalValue.toFixed(2)} RON</span>
-                    </div>
-                    <div class="delivery-checkbox-products">
-                        <strong>📦 Articole (${delivery.products.length}):</strong>
-                        ${delivery.products.map((p, pIdx) => `
-                            <div class="product-item">
-                                <span class="product-code">${p.code}</span>
-                                <span class="product-name">${p.name}</span>
-                                <span class="product-price">${p.price.toFixed(2)} RON</span>
-                            </div>
-                        `).join('')}
-                    </div>
+                        <button class="export-btn" onclick="exportVan(${van.id})">
+                            📋 Exportă Listă
+                        </button>
+                    ` : ''}
                 </div>
             `).join('');
             
-            document.getElementById('deliveriesChecklist').innerHTML = checklistHtml;
-            document.getElementById('filterSection').style.display = 'block';
+            document.getElementById('vansList').innerHTML = html;
         }
+		function addDeliveryToVan(delivery, van) {
+            if (!delivery || !van) return;
 
-        function findBestValueCluster(deliveries, count) {
-            if (deliveries.length <= count) {
-                return nearestNeighborRoute(deliveries);
+            // Verifică folosind ID-ul unic
+            if (van.deliveries.some(d => d.uniqueId === delivery.uniqueId)) {
+                console.warn('Livrarea este deja în dubă.');
+                return;
             }
 
-            let bestCluster = null;
-            let maxScore = -Infinity;
+            van.deliveries.push(delivery);
 
-            // Încearcă fiecare livrare ca punct de start
-            for (let start = 0; start < deliveries.length; start++) {
-                let cluster = [deliveries[start]];
-                let remaining = deliveries.filter((_, i) => i !== start);
-
-                while (cluster.length < count && remaining.length > 0) {
-                    // Calculează centrul actual al cluster-ului
-                    const center = {
-                        lat: cluster.reduce((sum, d) => sum + d.lat, 0) / cluster.length,
-                        lng: cluster.reduce((sum, d) => sum + d.lng, 0) / cluster.length
-                    };
-                    
-                    const avgValue = cluster.reduce((sum, d) => sum + d.totalValue, 0) / cluster.length;
-
-                    // Găsește următoarea cea mai bună livrare bazat pe score
-                    let maxDeliveryScore = -Infinity;
-                    let bestDelivery = null;
-                    let bestIdx = -1;
-
-                    for (let i = 0; i < remaining.length; i++) {
-                        const score = calculateScore(remaining[i], center, avgValue);
-                        if (score > maxDeliveryScore) {
-                            maxDeliveryScore = score;
-                            bestDelivery = remaining[i];
-                            bestIdx = i;
-                        }
-                    }
-
-                    cluster.push(bestDelivery);
-                    remaining.splice(bestIdx, 1);
-                }
-
-                // Calculează scorul total al cluster-ului
-                const totalValue = cluster.reduce((sum, d) => sum + d.totalValue, 0);
-                const totalDistance = calculateTotalDistance(cluster);
-                const clusterScore = totalValue / (totalDistance + 1);
-
-                if (clusterScore > maxScore) {
-                    maxScore = clusterScore;
-                    bestCluster = cluster;
-                }
+            // Găsește markerul folosind ID-ul unic
+            const markerIndex = allDeliveries.findIndex(d => d.uniqueId === delivery.uniqueId);
+            if (markerIndex !== -1 && markers[markerIndex]) {
+                map.removeLayer(markers[markerIndex]);
             }
-
-            return nearestNeighborRoute(bestCluster);
         }
 
-        function nearestNeighborRoute(deliveries) {
-            if (deliveries.length <= 1) return deliveries;
-
-            let route = [deliveries[0]];
-            let remaining = deliveries.slice(1);
-
-            while (remaining.length > 0) {
-                let minDist = Infinity;
-                let closestIdx = -1;
-
-                for (let i = 0; i < remaining.length; i++) {
-                    const dist = calculateDistance(
-                        route[route.length - 1].lat,
-                        route[route.length - 1].lng,
-                        remaining[i].lat,
-                        remaining[i].lng
-                    );
-                    if (dist < minDist) {
-                        minDist = dist;
-                        closestIdx = i;
-                    }
-                }
-
-                route.push(remaining[closestIdx]);
-                remaining.splice(closestIdx, 1);
-            }
-
-            return route;
+        function allowDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
         }
 
-        function calculateTotalDistance(route) {
-            let total = 0;
-            for (let i = 0; i < route.length - 1; i++) {
-                total += calculateDistance(
-                    route[i].lat, route[i].lng,
-                    route[i + 1].lat, route[i + 1].lng
-                );
-            }
-            return total;
+        function leaveDrop(e) {
+            e.currentTarget.classList.remove('drag-over');
         }
 
-        function displayClusters(clusters, date) {
-            document.getElementById('results').style.display = 'block';
-
-            const totalDeliveries = clusters.reduce((sum, c) => sum + c.deliveries.length, 0);
-            const totalValue = clusters.reduce((sum, c) => 
-                sum + c.deliveries.reduce((s, d) => s + d.totalValue, 0), 0);
-            const totalDistance = clusters.reduce((sum, c) => sum + calculateTotalDistance(c.deliveries), 0);
-            const myIncome = totalValue * 0.08;
+        function dropInVan(e, vanId) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
             
-            const statsHtml = `
-                <div class="stat-item">
-                    <div class="stat-value">${clusters.length}</div>
-                    <div class="stat-label">Clustere</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${totalDeliveries}</div>
-                    <div class="stat-label">Total Livrări</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${totalDistance.toFixed(1)} km</div>
-                    <div class="stat-label">Distanță Totală</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${totalValue.toFixed(0)} RON</div>
-                    <div class="stat-label">Valoare Totală</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${myIncome.toFixed(0)} RON</div>
-                    <div class="stat-label">Venit Tău (8%)</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${date}</div>
-                    <div class="stat-label">Data Livrare</div>
-                </div>
-            `;
-            document.getElementById('stats').innerHTML = statsHtml;
-
-            if (map) {
-                map.remove();
-            }
-
-            // Calculează bounds pentru toate clusterele
-            const allBounds = [];
-            clusters.forEach(cluster => {
-                cluster.deliveries.forEach(d => allBounds.push([d.lat, d.lng]));
-            });
-
-            map = L.map('map').setView([allBounds[0][0], allBounds[0][1]], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            markers = [];
-
-            // Desenează fiecare cluster
-            clusters.forEach((cluster, clusterIdx) => {
-                cluster.deliveries.forEach((delivery, index) => {
-                    const number = index + 1;
-                    const icon = L.divIcon({
-                        className: 'custom-marker',
-                        html: `<div style="background: ${cluster.color.primary}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; border: 3px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.3);">
-                            <div style="text-align: center; line-height: 1.2;">
-                                <div style="font-size: 10px;">C${cluster.id}</div>
-                                <div>${number}</div>
-                            </div>
-                        </div>`,
-                        iconSize: [40, 40],
-                        iconAnchor: [20, 20]
-                    });
-
-                    const popupContent = `
-                        <div style="min-width: 320px; max-height: 400px; overflow-y: auto;">
-                            <div style="background: ${cluster.color.primary}; color: white; padding: 10px; margin: -10px -10px 10px -10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-                                <span>🚚 Cluster ${cluster.id} - Livrare #${number}</span>
-                                <button onclick="removeDelivery('${delivery.address}')" style="background: rgba(255,255,255,0.2); border: 2px solid white; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
-                            </div>
-                            <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid #eee;">
-                                <div style="margin-bottom: 6px;">
-                                    <strong>👤 Client:</strong><br>
-                                    <span style="color: ${cluster.color.primary}; font-weight: 600;">${delivery.clientName}</span>
-                                </div>
-                                <div style="margin-bottom: 6px;">
-                                    <strong>🏪 Magazin:</strong><br>
-                                    ${delivery.storeName}
-                                </div>
-                                <div>
-                                    <strong>📍 Adresa:</strong><br>
-                                    <span style="font-size: 11px; color: #666;">${delivery.address}</span>
-                                </div>
-                            </div>
-                            <div style="margin-bottom: 8px;">
-                                <strong>📦 Produse (${delivery.products.length}):</strong>
-                            </div>
-                            ${delivery.products.map((p, idx) => `
-                                <div style="font-size: 11px; margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
-                                    <div style="font-weight: 600; color: #333; margin-bottom: 3px;">
-                                        ${idx + 1}. ${p.name}
-                                    </div>
-                                    <div style="color: #666; margin-bottom: 2px;">
-                                        <strong>Cod:</strong> ${p.code}
-                                    </div>
-                                    <div style="color: ${cluster.color.primary}; font-weight: bold;">
-                                        ${p.price.toFixed(2)} RON
-                                    </div>
-                                </div>
-                            `).join('')}
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 2px solid ${cluster.color.primary}; font-weight: bold; text-align: right; font-size: 16px;">
-                                Total: ${delivery.totalValue.toFixed(2)} RON
-                            </div>
-                        </div>
-                    `;
+            if (draggedDelivery) {
+                const van = vans.find(v => v.id === vanId);
+                if (van && !van.deliveries.find(d => d.idComanda === draggedDelivery.idComanda)) {
+                    van.deliveries.push(draggedDelivery);
+                    renderVans();
                     
-                    const marker = L.marker([delivery.lat, delivery.lng], {icon: icon})
-                        .addTo(map)
-                        .bindPopup(popupContent, {maxWidth: 400, maxHeight: 450});
-                    
-                    markers.push(marker);
-
-                    // Desenează linii între livrările din același cluster
-                    if (index < cluster.deliveries.length - 1) {
-                        L.polyline([
-                            [delivery.lat, delivery.lng],
-                            [cluster.deliveries[index + 1].lat, cluster.deliveries[index + 1].lng]
-                        ], {
-                            color: cluster.color.primary,
-                            weight: 3,
-                            opacity: 0.7
-                        }).addTo(map);
+                    // NOUA METODĂ: Șterge pin-ul de pe hartă
+                    const markerIndex = allDeliveries.findIndex(d => d.idComanda === draggedDelivery.idComanda);
+                    if (markerIndex !== -1 && markers[markerIndex]) {
+                        map.removeLayer(markers[markerIndex]);
                     }
-                });
-            });
+                }
+            }
+        }
 
-            map.fitBounds(allBounds, {padding: [50, 50]});
-
-            // Afișează lista pe clustere
-            const listHtml = clusters.map((cluster, cIdx) => {
-                const clusterDistance = calculateTotalDistance(cluster.deliveries);
-                const clusterValue = cluster.deliveries.reduce((sum, d) => sum + d.totalValue, 0);
-                const clusterIncome = clusterValue * 0.08;
-
-                return `
-                    <div class="cluster-section" style="border-color: ${cluster.color.primary}; background: ${cluster.color.light};">
-                        <div class="cluster-header" style="background: ${cluster.color.primary};">
-                            🚚 Cluster ${cluster.id} - ${cluster.deliveries.length} Livrări
-                        </div>
-                        <div class="cluster-stats">
-                            <div class="cluster-stat">
-                                <div class="cluster-stat-value">${clusterDistance.toFixed(1)} km</div>
-                                <div class="cluster-stat-label">Distanță</div>
-                            </div>
-                            <div class="cluster-stat">
-                                <div class="cluster-stat-value">${clusterValue.toFixed(0)} RON</div>
-                                <div class="cluster-stat-label">Valoare</div>
-                            </div>
-                            <div class="cluster-stat">
-                                <div class="cluster-stat-value">${clusterIncome.toFixed(0)} RON</div>
-                                <div class="cluster-stat-label">Venit (8%)</div>
-                            </div>
-                        </div>
-                        ${cluster.deliveries.map((delivery, index) => `
-                            <div class="delivery-item" style="border-left-color: ${cluster.color.primary};">
-                                <span class="delivery-number" style="background: ${cluster.color.primary};">${index + 1}</span>
-                                <div class="delivery-info">
-                                    <div class="delivery-address">${delivery.address}</div>
-                                    <div style="margin-top: 8px; padding: 8px; background: white; border-radius: 6px;">
-                                        <div style="margin-bottom: 5px;">
-                                            <strong>👤 Client:</strong> <span style="color: ${cluster.color.primary};">${delivery.clientName}</span>
-                                        </div>
-                                        <div style="margin-bottom: 8px;">
-                                            <strong>🏪 Magazin:</strong> ${delivery.storeName}
-                                        </div>
-                                        <div style="border-top: 1px solid #e0e0e0; padding-top: 8px;">
-                                            <strong>📦 Produse (${delivery.products.length}):</strong>
-                                            ${delivery.products.map((p, idx) => `
-                                                <div style="margin-top: 5px; padding-left: 10px; font-size: 13px;">
-                                                    ${idx + 1}. <strong>${p.code}</strong> - ${p.name}
-                                                    <span style="color: ${cluster.color.primary}; font-weight: bold; float: right;">${p.price.toFixed(2)} RON</span>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                        <div style="margin-top: 8px; padding-top: 8px; border-top: 2px solid ${cluster.color.primary}; text-align: right; font-weight: bold; font-size: 15px;">
-                                            Total: ${delivery.totalValue.toFixed(2)} RON
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }).join('');
+        function addToFirstAvailableVan(index) {
+            const delivery = allDeliveries[index];
             
-            document.getElementById('deliveryList').innerHTML = listHtml;
+            // Dacă nu există nicio dubă, creează una automat.
+            if (vans.length === 0) {
+                addNewVan();
+            }
+            // Adaugă livrarea mereu în prima dubă din listă.
+            const targetVan = vans[0];
+            
+            if (targetVan && !targetVan.deliveries.find(d => d.idComanda === delivery.idComanda)) {
+                targetVan.deliveries.push(delivery);
+                renderVans();
+                
+                // Șterge pin-ul de pe hartă (logica este mai jos)
+                const markerToRemove = markers[index];
+                if (markerToRemove) {
+                    map.removeLayer(markerToRemove);
+                }
+            }
+        }
+
+      function removeFromVan(vanId, deliveryIndex) {
+            const van = vans.find(v => v.id === vanId);
+            if (van) {
+                const removedDelivery = van.deliveries.splice(deliveryIndex, 1)[0];
+
+                // Găsește markerul folosind ID-ul unic pentru a-l reface pe hartă
+                const markerIndex = allDeliveries.findIndex(d => d.uniqueId === removedDelivery.uniqueId);
+                if (markerIndex !== -1 && markers[markerIndex]) {
+                    markers[markerIndex].addTo(map);
+                }
+
+                renderVans();
+            }
+        }
+
+        function exportVan(vanId) {
+            const van = vans.find(v => v.id === vanId);
+            if (!van) return;
+
+            let text = `DUBA ${van.id} - LISTĂ LIVRĂRI\n`;
+            text += `${'='.repeat(50)}\n\n`;
+            
+            van.deliveries.forEach((d, idx) => {
+                text += `${idx + 1}. ${d.beneficiar}\n`;
+                text += `   Adresă: ${d.adresaOriginala}\n`;
+                text += `   Magazin: ${d.magazin}\n`;
+                text += `   Comandă: ${d.idComanda}\n`;
+                text += `   Masă: ${d.masaTotala} kg\n`;
+                text += `   ${'-'.repeat(40)}\n`;
+            });
+            
+            text += `\nTOTAL: ${van.deliveries.length} livrări\n`;
+            text += `Masă totală: ${van.deliveries.reduce((sum, d) => sum + d.masaTotala, 0).toFixed(1)} kg`;
+
+            // Descarcă ca fișier text
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `duba_${vanId}_livrari.txt`;
+            a.click();
         }
 
         function showError(message) {
-            alert(message);
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
         }
+		// <<-- COD DE ADĂUGAT LA FINALUL SCRIPTULUI -->>
+        // Acest listener global asigură deblocarea hărții
+        document.addEventListener('mouseup', () => {
+            // Verificăm dacă harta există și dacă navigarea este dezactivată
+            if (map && map.dragging.enabled() === false) {
+                map.dragging.enable();
+            }
+        });
     </script>
 </body>
 </html>
